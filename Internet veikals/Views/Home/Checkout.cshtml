@@ -1,0 +1,89 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewBag.Title = "Checkout";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+
+    <div class="col-md-12">
+        <div class="nav-menus">
+
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a style="border-radius:initial;" href="@Url.Action("Index","Home")" class="nav-link">Home</a></li>
+                <li class="nav-item"><a style="border-radius:initial;" href="@Url.Action("Browse","Home")" class="nav-link">Browse</a></li>
+
+                @if (!SignInManager.IsSignedIn(User))
+                {
+                    <li class="nav-item pull-right"> <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a></li>
+                    <li class="nav-item pull-right"><a style="border-radius:initial;" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a></li>
+                }
+                else
+                {
+                    <li class="nav-item pull-right">
+                        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button id="logout" type="submit" class="nav-link btn text-dark" style="  background: none!important;border: none;">Logout</button>
+                        </form>
+                    </li>
+                    <li class="nav-item pull-right">
+                        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+                    </li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item pull-right"><a style="border-radius:initial;" href="@Url.Action("Categories","Admin")">Administrator panel</a></li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+
+</div>
+@if (@HttpContextAccessor.HttpContext.Session.GetObject<List<Item>>("cart") == null)
+{
+    <div class="alert alert-danger">
+        <strong>No product added to cart!</strong>
+    </div>
+
+}
+else
+{
+    var cart = (@HttpContextAccessor.HttpContext.Session.GetObject<List<Item>>("cart"));
+    cart = cart.OrderByDescending(t => t.Product.ProductName).ToList();
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Add</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Item item in cart)
+            {
+                <tr>
+                    <td>@item.Product.ProductName</td>
+                    <td>@item.Quantity</td>
+                    <td>
+                        <a href="@Url.Action("AddToCart", "Home", new { productId = item.Product.Id, url="Checkout" })">
+                            <i class="fa fa-plus"></i>
+                        </a>
+                        <a href="@Url.Action("DecreaseQty", "Home", new { productId = item.Product.Id})">
+                            <i class="fa fa-minus"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <a class="btn btn-success" href="@Url.Action("CheckoutDetails","Home")">Checkout >></a>
+
+}
+
+
+

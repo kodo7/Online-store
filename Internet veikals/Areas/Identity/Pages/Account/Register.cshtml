@@ -1,0 +1,67 @@
+﻿@page
+@model RegisterModel
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Register";
+}
+
+
+    <div class="nav-menus">
+
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a style="border-radius:initial;" href="@Url.Action("Index","Home")" class="nav-link">Home</a></li>
+            <li class="nav-item"><a style="border-radius:initial;" href="@Url.Action("Browse","Home")" class="nav-link">Browse</a></li>
+
+            @if (!SignInManager.IsSignedIn(User))
+            {
+                <li class="nav-item pull-right active"> <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a></li>
+                <li class="nav-item pull-right"><a style="border-radius:initial;" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a></li>
+            }
+            else
+            {
+                <li class="nav-item pull-right">
+                    <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button id="logout" type="submit" class="nav-link btn text-dark" style="  background: none!important;border: none;">Logout</button>
+                    </form>
+                </li>
+                <li class="nav-item pull-right">
+                    <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+                </li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item pull-right"><a style="border-radius:initial;" href="@Url.Action("Categories","Admin")">Administrator panel</a></li>
+                }
+            }
+        </ul>
+    </div>
+<h1>@ViewData["Title"]</h1>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <h4>Create a new account.</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Input.Email"></label>
+                <input asp-for="Input.Email" class="form-control" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Password"></label>
+                <input asp-for="Input.Password" class="form-control" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.ConfirmPassword"></label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

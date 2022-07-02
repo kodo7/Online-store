@@ -1,0 +1,106 @@
+﻿@model HomeViewModel
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Web.Common;
+@using X.PagedList.Mvc.Common;
+@using Microsoft.AspNetCore.Identity
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Browse";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+    <div class="nav-menus">
+
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a style="border-radius:initial;" href="@Url.Action("Index", "Home")" class="nav-link">Home</a></li>
+            <li class="nav-item active"><a style="border-radius:initial;" href="@Url.Action("Browse", "Home")" class="nav-link">Browse</a></li>
+
+            @if (!SignInManager.IsSignedIn(User))
+            {
+                <li class="nav-item pull-right"> <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a></li>
+                <li class="nav-item pull-right"><a style="border-radius:initial;" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a></li>
+            }
+            else
+            {
+                <li class="nav-item pull-right">
+                    <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button id="logout" type="submit" class="nav-link btn text-dark" style="  background: none!important;border: none;">Logout</button>
+                    </form>
+                </li>
+                <li class="nav-item pull-right">
+                    <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+                </li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item pull-right"><a style="border-radius:initial;" href="@Url.Action("Categories", "Admin")">Administrator panel</a></li>
+                }
+            }
+        </ul>
+    </div>
+
+<div class="row product-container">
+    <div class="col-md-10 col-sm-10 col-xs-10 pull-right">
+            @foreach (Product p in Model.productsPages)
+            {
+                bool available = false;
+                <div class="col-md-3 col-sm-3 col-xs-6" style="margin-bottom:8px;">
+                    <div class="thumbnail product-item" style="height:330px;">
+                        <img class="img-responsive" title="Click to View Product detail" style="cursor:pointer;height:160px;width:100%;" src="@("~/image/" + p.ImageName)" asp-append-version="true" />
+                        <div class="caption">
+                            <h5>@p.ProductName</h5>
+                            <p>@p.ProductPrice $</p>
+                            @*@foreach (CategoryProduct op in Model.categoryProducts)
+                            {
+                                @foreach (Category c in Model.categories)
+                                {
+                                    @if (p.Id == op.ProductId && c.Id == op.CategoryId)
+                                    {
+                                        <p>@c.CategoryName</p>
+                                    }
+                                }
+                            }*@
+                            @foreach (Stock s in Model.stocks)
+                            {
+                                @if (p.Id == s.ProductId && s.Qty > 0)
+                                    available = true;
+                            }
+                            @if (available)
+                            {
+                                @*<a class ="pull-right" href="#"><i class="fa fa-shopping-cart"></i></a>*@
+                                @using (Html.BeginForm("AddToCart", "Home", new { productId = p.Id, url = "Browse" }, FormMethod.Post))
+                                {
+                                    <button type="submit" class="pull-right"><i class="fa fa-shopping-cart"></i></button>
+                                }
+
+                                <p>Available</p>
+                            }
+                            else
+                            {
+                                <p>Unavailable</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        <div class="container">
+            <div class="container pull-right">
+                    @Html.PagedListPager(Model.productsPages, page => Url.Action("Browse", new { page }), new PagedListRenderOptions() { Display = PagedListDisplayMode.IfNeeded, DisplayItemSliceAndTotal = false });
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-2 col-xs-2">
+        <ul class="list-group">
+            @foreach (Category c in Model.categories)
+            {
+                <li class="list-group-item"><a href="@Url.Action("SelectCategory","Home",new { categoryId=c.Id})">@c.CategoryName</a></li>
+            }
+        </ul>
+    </div>
+
+</div>
+

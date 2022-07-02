@@ -1,0 +1,304 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.Identity
+@model Internet_veikals.Models.HomeViewModel
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewBag.Title = "CheckoutDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<link href="~/css/Checkout.css" rel="stylesheet" />
+<!------ Include the above in your HEAD tag ---------->
+<div class="row">
+
+    <div class="col-md-12">
+        <div class="nav-menus">
+
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a style="border-radius:initial;" href="@Url.Action("Index", "Home")" class="nav-link">Home</a></li>
+                <li class="nav-item"><a style="border-radius:initial;" href="@Url.Action("Browse", "Home")" class="nav-link">Browse</a></li>
+
+                @if (!SignInManager.IsSignedIn(User))
+                {
+                    <li class="nav-item pull-right"> <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a></li>
+                    <li class="nav-item pull-right"><a style="border-radius:initial;" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a></li>
+                }
+                else
+                {
+                    <li class="nav-item pull-right">
+                        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button id="logout" type="submit" class="nav-link btn text-dark" style="  background: none!important;border: none;">Logout</button>
+                        </form>
+                    </li>
+                    <li class="nav-item pull-right">
+                        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+                    </li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item pull-right"><a style="border-radius:initial;" href="@Url.Action("Categories", "Admin")">Administrator panel</a></li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+
+</div>
+<div class="container wrapper">
+    <div class="row cart-head">
+        <div class="container">
+            <div class="row">
+                <p></p>
+            </div>
+            <div class="row">
+                <p></p>
+            </div>
+        </div>
+    </div>
+    <div class="row cart-body">
+        <div class="form-horizontal">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-md-push-6 col-sm-push-6">
+                <!--REVIEW ORDER-->
+                @{int Total = 0;
+                    @foreach (Item item in @HttpContextAccessor.HttpContext.Session.GetObject<List<Item>>("cart"))
+                    {
+                        int lineTotal = Convert.ToInt32(item.Quantity * item.Product.ProductPrice);
+                        Total = Convert.ToInt32(@Total + lineTotal);
+                    }
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            Review Order <div class="pull-right"><small><a class="afix-1" href="@Url.Action("Checkout", "Home")">Edit Cart</a></small></div>
+                        </div>
+                        <div class="panel-body">
+                            @foreach (Item item in @HttpContextAccessor.HttpContext.Session.GetObject<List<Item>>("cart"))
+                            {
+                                <div class="form-group">
+                                    <div class="col-sm-3 col-xs-3">
+                                        <img class="img-responsive" src="~/Image/@item.Product.ImageName" />
+                                    </div>
+                                    <div class="col-sm-6 col-xs-6">
+                                        <div class="col-xs-12">@item.Product.ProductName</div>
+                                        <div class="col-xs-12"><small>Quantity:<span>@item.Quantity</span></small></div>
+                                    </div>
+                                    <div class="col-sm-3 col-xs-3 text-right">
+                                        <h6><span>$</span>@item.Product.ProductPrice</h6>
+                                    </div>
+                                </div>
+                                <div class="form-group"><hr /></div>
+                            }
+                            <div class="form-group">
+                                <div class="col-xs-12">
+                                    <strong>Subtotal</strong>
+                                    <div class="pull-right"><span>$</span><span>@Total</span></div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <small>Shipping</small>
+                                    <div class="pull-right"><span id="shipping">Please select shipping type</span></div>
+                                </div>
+                            </div>
+                            <div class="form-group"><hr /></div>
+                            <div class="form-group">
+                                <div class="col-xs-12">
+                                    <strong>Order Total</strong>
+                                    <div class="pull-right"><span id="shippingandtotal">Please select shipping type</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <!--REVIEW ORDER END-->
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-md-pull-6 col-sm-pull-6">
+                <!--SHIPPING METHOD-->
+                @if (!SignInManager.IsSignedIn(User))
+                {
+                    <form asp-action="CheckoutDetails">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">Address</div>
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <h4>Shipping Address</h4>
+                                    </div>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.Country" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.Country" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.Country" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.City" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.City" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.City" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.PostCode" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.PostCode" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.PostCode" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.Address" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.Address" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.Address" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.PhoneNumber" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.PhoneNumber" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.PhoneNumber" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.ShippingType" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <select asp-for="@Model.order.ShippingType" class="form-control" onchange="val()" id="select_id">
+                                            <option></option>
+                                            <option value="DPD">DPD</option>
+                                            <option value="To Address">To Address</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="@Model.order.ShippingType" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.Email" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.Email" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group  pull-right">
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <button type="submit" class="btn btn-primary btn-submit-fix">Place Order</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="CheckoutDetails">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">Address</div>
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <h4>Shipping Address</h4>
+                                    </div>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.Country" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.Country" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.Country" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.City" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.City" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.City" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.PostCode" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.PostCode" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.PostCode" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.Address" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.Address" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.Address" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.PhoneNumber" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <input asp-for="@Model.order.PhoneNumber" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="@Model.order.PhoneNumber" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><label asp-for="@Model.order.ShippingType" class="control-label"></label></div>
+                                    <div class="col-md-12">
+                                        <select asp-for="@Model.order.ShippingType" class="form-control" onchange="val()" id="select_id">
+                                            <option></option>
+                                            <option value="DPD">DPD</option>
+                                            <option value="To Address">To Address</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="@Model.order.ShippingType" class="text-danger"></span>
+                                </div>
+                                <input type="hidden" asp-for="@Model.order.Email" class="form-control" value="@UserManager.GetUserAsync(User).Result.Email" />
+                                <input type="hidden" asp-for="@Model.order.UserId" class="form-control" value="@UserManager.GetUserAsync(User).Result.Id" />
+                                <div class="form-group  pull-right">
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <button type="submit" class="btn btn-primary btn-submit-fix">Place Order</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                }
+
+                <!--SHIPPING METHOD END-->
+            </div>
+
+        </div>
+    </div>
+    <div class="row cart-footer">
+
+    </div>
+</div>
+
+
+
+<script>
+    function val() {
+        d = document.getElementById("select_id").value;
+        document.getElementById("shipping").value = d;
+        shippingPriceAddress = 10;
+        shippingPriceDPD = 5;
+        if (d=="To Address") {
+            $("#shipping").empty().append("$" + shippingPriceAddress);
+            $("#shippingandtotal").empty().append("$");
+            $("#shippingandtotal").append(@Total + shippingPriceAddress);
+        } else if (d == "DPD") {
+            $("#shipping").empty().append("$" + shippingPriceDPD);
+            $("#shippingandtotal").empty().append("$");
+            $("#shippingandtotal").append(@Total + shippingPriceDPD);
+        } else {
+            $("#shipping").empty().append("Please select shipping type");
+            $("#shippingandtotal").empty().append("Please select shipping type");
+        }
+    }
+</script>

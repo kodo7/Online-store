@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Internet_veikals</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="~/css/MyMainLayOut.css" rel="stylesheet" />
+    @*@<link rel="stylesheet" href="~/css/site.css" />*@
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="logo">
+                    <h1><a href="@Url.Action("Index","Home")">Computer store</a></h1>
+                </div>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">Cart <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        @if (@HttpContextAccessor.HttpContext.Session.GetObject<List<Item>>("cart") != null)
+                        {
+                            var cart = (@HttpContextAccessor.HttpContext.Session.GetObject<List<Item>>("cart"));
+                            cart = cart.OrderByDescending(t => t.Product.ProductName).ToList();
+                            @foreach (var item in cart)
+                            {
+                                <li>
+                                    <a href="@Url.Action("RemoveFromCart","Home",new { productId=item.Product.Id})">@item.Product.ProductName (@item.Quantity) <i class="fa fa-times"></i></a>
+                                </li>
+                            }
+                        }
+                        <li class="divider"></li>
+                        <li><a href="@Url.Action("Checkout","Home")">Checkout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+
+        @RenderBody()
+    </div>
+    @*<div class="container">
+            <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                <partial name="_LoginPartial"/>
+            </div>
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>*@
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; @DateTime.Now.Year - Computer Store. Elvijs Raudis.
+        </div>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

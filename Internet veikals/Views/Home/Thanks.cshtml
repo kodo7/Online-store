@@ -1,0 +1,41 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Thanks";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="col-md-12">
+    <div class="nav-menus">
+
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a style="border-radius:initial;" href="@Url.Action("Index", "Home")" class="nav-link">Home</a></li>
+            <li class="nav-item active"><a style="border-radius:initial;" href="@Url.Action("Browse", "Home")" class="nav-link">Browse</a></li>
+
+            @if (!SignInManager.IsSignedIn(User))
+            {
+                <li class="nav-item pull-right"> <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a></li>
+                <li class="nav-item pull-right"><a style="border-radius:initial;" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a></li>
+            }
+            else
+            {
+                <li class="nav-item pull-right">
+                    <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button id="logout" type="submit" class="nav-link btn text-dark" style="  background: none!important;border: none;">Logout</button>
+                    </form>
+                </li>
+                <li class="nav-item pull-right">
+                    <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+                </li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item pull-right"><a style="border-radius:initial;" href="@Url.Action("Categories", "Admin")">Administrator panel</a></li>
+                }
+            }
+        </ul>
+    </div>
+</div>
+<h1>Thank you for the order!</h1>
+

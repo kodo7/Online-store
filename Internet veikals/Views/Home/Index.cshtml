@@ -1,0 +1,141 @@
+﻿@model HomeViewModel
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Web.Common;
+@using X.PagedList.Mvc.Common;
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="row">
+
+    <div class="col-md-12">
+        <div class="nav-menus">
+
+            <ul class="nav nav-pills">
+                <li class="nav-item active"><a style="border-radius:initial;" href="@Url.Action("Index","Home")" class="nav-link">Home</a></li>
+                <li class="nav-item"><a style="border-radius:initial;" href="@Url.Action("Browse","Home")" class="nav-link">Browse</a></li>
+
+                @if (!SignInManager.IsSignedIn(User))
+                {
+                    <li class="nav-item pull-right"> <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a></li>
+                    <li class="nav-item pull-right"><a style="border-radius:initial;" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a></li>
+                }
+                else
+                {
+                    <li class="nav-item pull-right">
+                        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button id="logout" type="submit" class="nav-link btn text-dark" style="  background: none!important;border: none;">Logout</button>
+                        </form>
+                    </li>
+                    <li class="nav-item pull-right">
+                        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+                    </li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item pull-right"><a style="border-radius:initial;" href="@Url.Action("Categories","Admin")">Administrator panel</a></li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+
+</div>
+<div id="themeSlider" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+        <li data-target="#themeSlider" data-slide-to="0" class="active"></li>
+        <li data-target="#themeSlider" data-slide-to="1"></li>
+        <li data-target="#themeSlider" data-slide-to="2"></li>
+    </ol>
+
+    <div class="carousel-inner">
+        <div class="item active">
+            <div class="imgOverlay"></div>
+            <img style="height:300px;" src="~/image/slide1.jpg" alt="First slide">
+            <div class="carousel-caption">
+                <h3>RTX 3090 TI</h3>
+            </div>
+        </div>
+        <div class="item">
+            <div class="imgOverlay"></div>
+            <img style="height:300px;" src="~/image/slide2.jpg" alt="Second slide">
+            <div class="carousel-caption">
+                <h3>AMD Ryzen™ 9 5950X</h3>
+            </div>
+        </div>
+        <div class="item">
+            <div class="imgOverlay"></div>
+            <img style="height:300px;" src="~/image/slide3.jpg" alt="Third slide">
+            <div class="carousel-caption">
+                <h3> AMD Radeon™ RX 6800 XT</h3>
+            </div>
+        </div>
+    </div>
+
+    <a class="left carousel-control" href="#themeSlider" data-slide="prev">
+        <span class="fa fa-chevron-left"></span>
+    </a>
+    <a class="right carousel-control" href="#themeSlider" data-slide="next">
+        <span class="fa fa-chevron-right"></span>
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h2>Our Products</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row product-container">
+    @foreach (Product p in Model.productsPages)
+    {
+        bool available = false;
+        <div class="col-md-3 col-sm-3 col-xs-6" style="margin-bottom:8px;">
+            <div class="thumbnail product-item" style="height:330px;">
+                <img class="img-responsive" title="Click to View Product detail" style="cursor:pointer;height:160px;width:100%;" src="@("~/image/"+p.ImageName)" asp-append-version="true" />
+                <div class="caption">
+                    <h5>@p.ProductName</h5>
+                    <p>@p.ProductPrice $</p>
+                    @*@foreach (CategoryProduct op in Model.categoryProducts)
+                        {
+                            @foreach (Category c in Model.categories)
+                            {
+                                @if (p.Id == op.ProductId && c.Id == op.CategoryId)
+                                {
+                                    <p>@c.CategoryName</p>
+                                }
+                            }
+                        }*@
+                    @foreach (Stock s in Model.stocks)
+                    {
+                        @if (p.Id == s.ProductId && s.Qty > 0)
+                            available = true;
+                    }
+                    @if (available)
+                    {
+                        @*<a class ="pull-right" href="#"><i class="fa fa-shopping-cart"></i></a>*@
+                        @using (Html.BeginForm("AddToCart", "Home", new { productId = p.Id }, FormMethod.Post))
+                        {
+                            <button type="submit" class="pull-right"><i class="fa fa-shopping-cart"></i></button>
+                        }
+
+                        <p>Available</p>
+                    }
+                    else
+                    {
+                        <p>Unavailable</p>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    <div class="container">
+        <div class="container">
+            @Html.PagedListPager(Model.productsPages, page => Url.Action("Index", new { page }), new PagedListRenderOptions() { Display = PagedListDisplayMode.IfNeeded, DisplayItemSliceAndTotal = false })
+        </div>
+    </div>
+</div>

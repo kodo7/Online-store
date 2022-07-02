@@ -1,0 +1,4 @@
+C:\Users\fishy\source\repos\Internet veikals\obj\Debug\netcoreapp3.1\Internet veikals.csprojAssemblyReference.cache
+C:\Users\fishy\source\repos\Internet veikals\obj\Debug\netcoreapp3.1\Internet veikals.csproj.CoreCompileInputs.cache
+C:\Users\fishy\source\repos\Internet veikals\obj\Debug\netcoreapp3.1\Internet veikals.AssemblyInfoInputs.cache
+C:\Users\fishy\source\repos\Internet veikals\obj\Debug\netcoreapp3.1\Internet veikals.AssemblyInfo.cs

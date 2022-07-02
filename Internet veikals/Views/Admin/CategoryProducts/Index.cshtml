@@ -1,0 +1,50 @@
+﻿@model IEnumerable<Internet_veikals.Models.CategoryProduct>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active">CategoryProducts</li>
+    </ol>
+</div>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Product)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Product.ProductName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { idC = item.CategoryId, idP = item.ProductId}) |
+                    @Html.ActionLink("Details", "Details", new { idC = item.CategoryId, idP = item.ProductId }) |
+                    @Html.ActionLink("Delete", "Delete", new { idC = item.CategoryId, idP = item.ProductId })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

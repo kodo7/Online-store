@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\fishy\\source\\repos\\Internet veikals\\Internet veikals\\Internet veikals.csproj": {}
+    "C:\\Users\\fishy\\Source\\Repos\\Online-store\\Internet veikals\\Internet veikals.csproj": {}
   },
   "projects": {
-    "C:\\Users\\fishy\\source\\repos\\Internet veikals\\Internet veikals\\Internet veikals.csproj": {
+    "C:\\Users\\fishy\\Source\\Repos\\Online-store\\Internet veikals\\Internet veikals.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\fishy\\source\\repos\\Internet veikals\\Internet veikals\\Internet veikals.csproj",
+        "projectUniqueName": "C:\\Users\\fishy\\Source\\Repos\\Online-store\\Internet veikals\\Internet veikals.csproj",
         "projectName": "Internet veikals",
-        "projectPath": "C:\\Users\\fishy\\source\\repos\\Internet veikals\\Internet veikals\\Internet veikals.csproj",
+        "projectPath": "C:\\Users\\fishy\\Source\\Repos\\Online-store\\Internet veikals\\Internet veikals.csproj",
         "packagesPath": "C:\\Users\\fishy\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\fishy\\source\\repos\\Internet veikals\\Internet veikals\\obj\\",
+        "outputPath": "C:\\Users\\fishy\\Source\\Repos\\Online-store\\Internet veikals\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\fishy\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "kt9Kye14vI1cP+EYthZrvN3QgSc01ozCKMjpEnm+Y4zz2F63TQegjB05aKNtII4SNMvqLlGEO4ikONMkgRA/eQ==",
+  "dgSpecHash": "mhP1dr6FQRmU6QXm+zoihfT8VEqE+h01Zu66xuRWM0rKU/c1hU82GEABn5w/OXdbur8jOSvPPuhB1LS3GL3ofg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\fishy\\source\\repos\\Internet veikals\\Internet veikals\\Internet veikals.csproj",
+  "projectFilePath": "C:\\Users\\fishy\\Source\\Repos\\Online-store\\Internet veikals\\Internet veikals.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\fishy\\.nuget\\packages\\microsoft.aspnetcore.antiforgery\\2.2.0\\microsoft.aspnetcore.antiforgery.2.2.0.nupkg.sha512",
     "C:\\Users\\fishy\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.2.0\\microsoft.aspnetcore.authentication.abstractions.2.2.0.nupkg.sha512",
